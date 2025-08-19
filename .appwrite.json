@@ -1,0 +1,7 @@
+{
+  "commands": {
+    "install": "yarn install --production",
+    "build": "yarn build",
+    "run": "yarn start"
+  }
+}
