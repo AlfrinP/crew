@@ -1,7 +1,12 @@
 {
+  "name": "crew",
   "commands": {
     "install": "yarn install --production",
     "build": "yarn build",
     "run": "yarn start"
-  }
+  },
+  "cache": [
+    "node_modules",
+    ".next/cache"
+  ]
 }
