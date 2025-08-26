@@ -22,8 +22,8 @@ const LoginPage: React.FC = () => {
       await account.createEmailPasswordSession(email, password);
       const user = await account.get();
       setLoggedInUser(user as User);
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -35,8 +35,8 @@ const LoginPage: React.FC = () => {
       setError(null);
       await account.create('unique()', email, password, name);
       await login(email, password);
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -46,8 +46,8 @@ const LoginPage: React.FC = () => {
     try {
       await account.deleteSession('current');
       setLoggedInUser(null);
-    } catch (err: any) {
-      setError(err.message || 'Logout failed');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Logout failed');
     }
   };
 

@@ -1,11 +1,10 @@
+import { TiptapEditorProps } from '@/lib/types';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { TiptapEditorProps } from '../../../lib/types';
 
 export const TiptapEditor: React.FC<TiptapEditorProps> = ({
   onChange,
   initialContent = '',
-  placeholder = 'Start writing...',
 }) => {
   const editor = useEditor({
     extensions: [StarterKit],

@@ -24,11 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import {
-  addEventFormSchema,
-  CreateEventDTO,
-  CreateEventFormDTO,
-} from '@/lib/types';
+import { addEventFormSchema, CreateEventFormDTO } from '@/lib/types';
 import { toast } from 'sonner';
 import { addEvents } from '../../(actions)/eventServerActions';
 import { uploadFile } from '@/actions/storage.actions';
