@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { mockEvents } from '@/lib/data';
 import { EventCard } from '@/components/event-card';
@@ -27,7 +25,7 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/add-event">
+            <Link href="dashboard/add-event" about="adding new events">
               <Button className="w-full">
                 <Plus className="mr-2 size-4" />✨ Add Event
               </Button>
@@ -49,7 +47,7 @@ export default function Dashboard() {
             Discover and manage upcoming college events
           </p>
         </div>
-        <Link href="/add-event">
+        <Link href="dashboard/add-event" about='adding new events'>
           <Button>
             <Plus className="mr-2 size-4" />
             Add Event

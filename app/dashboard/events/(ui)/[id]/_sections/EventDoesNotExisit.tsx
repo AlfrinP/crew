@@ -19,7 +19,7 @@ export default function EventDoesNotExisit() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link href="/">
+          <Link href="dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
         </CardContent>

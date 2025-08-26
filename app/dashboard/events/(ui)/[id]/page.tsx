@@ -80,7 +80,7 @@ export default function EventDetailsPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
-        <Link href="/">
+        <Link href="dashboard">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="size-4" />
           </Button>

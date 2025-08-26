@@ -1,12 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { EventFormData } from '@/lib/types';
-import { EventPreview } from '@/components/event-preview';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,14 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -34,55 +22,78 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Eye, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-
-const eventFormSchema = z.object({
-  title: z
-    .string()
-    .min(1, 'Title is required')
-    .min(3, 'Title must be at least 3 characters'),
-  description: z
-    .string()
-    .min(1, 'Description is required')
-    .min(10, 'Description must be at least 10 characters'),
-  date: z.string().min(1, 'Date is required'),
-  time: z.string().min(1, 'Time is required'),
-  note: z.string().optional(),
-  importantInstructions: z.string().optional(),
-});
+import {
+  addEventFormSchema,
+  CreateEventDTO,
+  CreateEventFormDTO,
+} from '@/lib/types';
+import { toast } from 'sonner';
+import { addEvents } from '../../(actions)/eventServerActions';
+import { uploadFile } from '@/actions/storage.actions';
 
 export default function AddEventPage() {
   const router = useRouter();
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const form = useForm<EventFormData>({
-    resolver: zodResolver(eventFormSchema),
+  const form = useForm({
+    resolver: zodResolver(addEventFormSchema),
     defaultValues: {
       title: '',
       description: '',
       date: '',
       time: '',
+      location: '',
+      rules: '',
       note: '',
       importantInstructions: '',
+      image: undefined,
     },
   });
 
-  const onSubmit = (data: EventFormData) => {
-    // Here you would typically send the data to your backend
-    console.log('Event created:', data);
+  const onSubmit = async (data: CreateEventFormDTO) => {
+    try {
+      // First upload the image
+      const imageUploadResponse = await uploadFile(data.image);
+      if (!imageUploadResponse) {
+        toast.error('Failed to upload image');
+        return;
+      }
 
-    // For demo purposes, show success and redirect
-    alert('Event created successfully! 🎉');
-    router.push('/');
+      // Combine date and time
+      const dateObj = new Date(data.date);
+      const [hours, minutes] = data.time.split(':');
+      dateObj.setHours(parseInt(hours), parseInt(minutes));
+
+      // Destructure time & image so they don't get included in eventData
+      const { time, image, ...rest } = data;
+
+      // Create event data with image storage ID
+      const eventData = {
+        ...rest,
+        date: dateObj,
+        imageStorageId: imageUploadResponse.$id,
+      };
+
+      const eventFromResponse = await addEvents(eventData);
+      if (!eventFromResponse) {
+        toast.error('Failed to create event');
+        return;
+      }
+
+      toast.success('Event created successfully!');
+      form.reset();
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error creating event:', error);
+      toast.error('Failed to create event');
+    }
   };
-
-  const watchedValues = form.watch();
 
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
-        <Link href="/">
+        <Link href="dashboard">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 size-4" />
             Back to Dashboard
@@ -126,6 +137,27 @@ export default function AddEventPage() {
 
                 <FormField
                   control={form.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            field.onChange(file);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
@@ -150,7 +182,17 @@ export default function AddEventPage() {
                       <FormItem>
                         <FormLabel>Date</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input
+                            type="date"
+                            {...field}
+                            value={
+                              field.value
+                                ? new Date(field.value)
+                                    .toISOString()
+                                    .split('T')[0]
+                                : ''
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -171,6 +213,41 @@ export default function AddEventPage() {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter event location" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="rules"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rules</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter event rules and guidelines..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Specify the rules and guidelines for participants
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
@@ -214,49 +291,13 @@ export default function AddEventPage() {
                   )}
                 />
 
-                <div className="flex gap-4">
-                  <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex-1"
-                      >
-                        <Eye className="mr-2 size-4" />
-                        Preview
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Event Preview</DialogTitle>
-                        <DialogDescription>
-                          This is how your event will appear to users
-                        </DialogDescription>
-                      </DialogHeader>
-                      <EventPreview data={watchedValues} />
-                    </DialogContent>
-                  </Dialog>
-
-                  <Button type="submit" className="flex-1">
-                    <Sparkles className="mr-2 size-4" />✨ Create Event
-                  </Button>
-                </div>
+                <Button type="submit" className="flex-1">
+                  <Sparkles className="mr-2 size-4" />✨ Create Event
+                </Button>
               </form>
             </Form>
           </CardContent>
         </Card>
-
-        <div className="hidden lg:block">
-          <Card className="sticky top-24">
-            <CardHeader>
-              <CardTitle>Live Preview</CardTitle>
-              <CardDescription>See how your event will look</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <EventPreview data={watchedValues} />
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
