@@ -1,3 +1,4 @@
+import { ImageFormat, ImageGravity } from 'appwrite';
 import z from 'zod';
 
 export type Event = {
@@ -24,6 +25,17 @@ export type CreateEventFormDTO = Omit<
 };
 
 export type CreateEventDTO = Omit<Event, '$id' | '$updatedAt' | '$createdAt'>;
+
+export type EventListDTO = Omit<
+  Event,
+  | '$id'
+  | '$updatedAt'
+  | '$createdAt'
+  | 'note'
+  | 'importantInstructions'
+  | 'location'
+  | 'rules'
+>;
 
 export type StorageUploadResult = {
   $id: string;
@@ -104,3 +116,19 @@ export const addEventFormSchema = z.object({
     'Image size must be less than 1MB',
   ),
 });
+
+export type GetFilePreviewParams = {
+  fileId: string;
+  width?: number;
+  height?: number;
+  gravity?: ImageGravity;
+  quality?: number;
+  borderWidth?: number;
+  borderColor?: string;
+  borderRadius?: number;
+  opacity?: number;
+  rotation?: number;
+  background?: string;
+  output?: ImageFormat;
+  token?: string;
+};

@@ -26,7 +26,7 @@ import { ArrowLeft, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { addEventFormSchema, CreateEventFormDTO } from '@/lib/types';
 import { toast } from 'sonner';
-import { addEvents } from '../../(actions)/eventServerActions';
+import { addEvents } from '../../(actions)/eventActions';
 import { uploadFile } from '@/actions/storage.actions';
 
 export default function AddEventPage() {
