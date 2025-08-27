@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import { mockEvents } from '@/lib/data';
-import { EventCard } from '@/components/event-card';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,9 +8,13 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
+import { getAllEvents } from './(events)/(actions)/eventActions';
+import EventCard from '@/components/event-card';
 
-export default function Dashboard() {
-  const events = mockEvents;
+export default async function Dashboard() {
+  const events =
+    (await getAllEvents({ currentPage: 1, eventsPerPage: 20 })) ?? [];
+  console.log(events);
 
   if (events.length === 0) {
     return (
@@ -25,7 +27,7 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="dashboard/add-event" about="adding new events">
+            <Link href="/dashboard/add-event" about="adding new events">
               <Button className="w-full">
                 <Plus className="mr-2 size-4" />✨ Add Event
               </Button>
@@ -47,7 +49,7 @@ export default function Dashboard() {
             Discover and manage upcoming college events
           </p>
         </div>
-        <Link href="dashboard/add-event" about='adding new events'>
+        <Link href="/dashboard/add-event" about="adding new events">
           <Button>
             <Plus className="mr-2 size-4" />
             Add Event
@@ -57,7 +59,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {events.map((event) => (
-          <EventCard key={event.id} event={event} />
+          <EventCard key={event.$id} eventDetails={event} />
         ))}
       </div>
 

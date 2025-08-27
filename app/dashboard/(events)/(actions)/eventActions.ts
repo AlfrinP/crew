@@ -47,6 +47,7 @@ export async function getAllEvents({
     );
 
     const EventsList: EventListDTO[] = response.documents.map((doc) => ({
+      $id: doc.$id,
       title: doc.title,
       description: doc.description,
       date: doc.date,

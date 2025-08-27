@@ -28,7 +28,6 @@ export type CreateEventDTO = Omit<Event, '$id' | '$updatedAt' | '$createdAt'>;
 
 export type EventListDTO = Omit<
   Event,
-  | '$id'
   | '$updatedAt'
   | '$createdAt'
   | 'note'

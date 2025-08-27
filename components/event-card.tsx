@@ -1,7 +1,6 @@
-'use client';
-
 import Link from 'next/link';
-import { Event } from '@/lib/types';
+import Image from 'next/image';
+import { EventListDTO } from '@/lib/types';
 import { formatDate, formatTime } from '@/lib/data';
 import {
   Card,
@@ -11,20 +10,33 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { CalendarDays, Clock } from 'lucide-react';
-import Image from 'next/image';
+import { getFilePreviewFromStorage } from '@/actions/storage.actions';
 
-interface EventCardProps {
-  event: Event;
-}
+export default async function EventCard({
+  eventDetails,
+}: {
+  eventDetails: EventListDTO;
+}) {
+  const eventImage = eventDetails.imageStorageId
+    ? await getFilePreviewFromStorage({
+        fileId: eventDetails.imageStorageId,
+        width: 400,
+        height: 250,
+      })
+    : null;
 
-export function EventCard({ event }: EventCardProps) {
+  const imageUrl = eventImage ?? '/api/placeholder/400/250';
+
   return (
-    <Link href={`/events/${event.id}`} className="group block">
+    <Link
+      href={`/dashboard/events/${eventDetails.$id}`}
+      className="group block"
+    >
       <Card className="overflow-hidden pt-0">
         <div className="h-1/5 w-full overflow-clip transition-transform group-hover:scale-110">
           <Image
-            src={event.image || '/api/placeholder/400/250'}
-            alt={event.title}
+            src={imageUrl}
+            alt={eventDetails.title}
             width={1000}
             height={1000}
             className="size-full object-cover"
@@ -33,22 +45,22 @@ export function EventCard({ event }: EventCardProps) {
         <div className="h-4/5 flex-1">
           <CardHeader className="pb-4">
             <CardTitle className="line-clamp-2 text-lg">
-              {event.title}
+              {eventDetails.title}
             </CardTitle>
             <div className="text-muted-foreground flex flex-col gap-2 text-sm">
               <div className="flex items-center gap-2">
                 <CalendarDays className="size-4" />
-                <span>{formatDate(event.date)}</span>
+                {/* <span>{formatDate(eventDetails.date.toISOString())}</span> */}
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="size-4" />
-                <span>{formatTime(event.time)}</span>
+                {/* <span>{formatTime(eventDetails.date.toISOString())}</span> */}
               </div>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
             <CardDescription className="line-clamp-3">
-              {event.description}
+              {eventDetails.description}
             </CardDescription>
           </CardContent>
         </div>
