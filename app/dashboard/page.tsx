@@ -10,11 +10,16 @@ import {
 import { Plus } from 'lucide-react';
 import { getAllEvents } from './(events)/(actions)/eventActions';
 import EventCard from '@/components/event-card';
+import { account } from '@/utils/appwrite';
 
 export default async function Dashboard() {
   const events =
     (await getAllEvents({ currentPage: 1, eventsPerPage: 20 })) ?? [];
   console.log(events);
+
+  const session = await account.get();
+
+  console.log(session);
 
   if (events.length === 0) {
     return (
